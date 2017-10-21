@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div class="container">
     <div v-if="error" style="color: red">{{error}}</div>
-    <h1>Hi, I'm a huge idiot</h1>
-    <p v-if="!accountBalance">And I'm a broke sucker</p>
-    <p v-else>But I'm a rich fucker with {{accountBalance}} ether!</p>
-    <textarea v-model="message"></textarea>
-    <button :disabled="!message" @click.prevent="postMessage">Post it!</button>
+    <div class="form-group">
+      <textarea class="form-control" v-model="message"></textarea>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" :disabled="!message" @click.prevent="postMessage">Post it!</button>
+    </div>
   </div>
 </template>
 <script>
@@ -27,11 +28,11 @@ export default {
       );
     },
     async postMessage() {
-      console.log("Posting message "+this.message);
+      this.message = "";
       var hash = sha("sha256").update(this.message).digest("hex");
       var account = await this.getDefaultAccount();
       Talk.deployed()
-        .then(talk => { console.log("Deployed"); return talk.post(hash, { from: account }) })
+        .then(talk => talk.post(hash, { from: account }))
         .then(tx => console.log(tx))
         .catch(err => this.error = err)
     }
@@ -45,3 +46,6 @@ export default {
   }
 }
 </script>
+<style>
+  @import "../node_modules/bootstrap/dist/css/bootstrap.css"
+</style>
