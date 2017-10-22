@@ -17,9 +17,8 @@
       </div>
     </nav>
     <div class="container">
-      <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </div>
+      <div :class="['alert', watch.status=='pending' ? 'alert-info' : 'alert-success']" v-for="watch in watches">{{watch.message}}</div>
+      <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}</div>
       <div class="panel panel-default" v-for="post in posts">
         <div class="panel-heading">{{post.author}} {{post.timestamp}}</div>
         <div class="panel-body">

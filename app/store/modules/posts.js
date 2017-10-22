@@ -22,6 +22,7 @@ export default {
     async refresh({state, commit, dispatch}) {
       var count = await contracts.talk.countPosts();
       commit('totalCount', count.toNumber());
+
       var posts = await Promise.all(
         Array(state.totalCount).fill()
           .map((_,i) => contracts.talk.getPost(i))
@@ -34,9 +35,9 @@ export default {
     },
     async post({state, rootState, commit, dispatch}, message) {
       if(!message || !message.length) return;
-      if(!rootState.account) return;
-      await contracts.talk.post(message, { from: rootState.account.address });
-      dispatch("refresh");
+      if(!rootState.account) return dispatch("addError", "Must be logged in to post", {root: true });
+      var receipt = await contracts.talk.post(message, { from: rootState.account.address });
+      commit("addTxWatch", { tx: receipt.tx, message: "Pending post" }, { root: true });
     }
   }
 }

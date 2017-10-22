@@ -8,7 +8,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     account: null,
-    errors: []
+    errors: [],
+    watches: []
   },
   mutations: {
     account(state, account) {
@@ -19,6 +20,9 @@ export default new Vuex.Store({
     },
     addError(state, message) {
       state.errors.push(message);
+    },
+    addTxWatch(state, {tx, message}) {
+      state.watches.push({tx, message, status: "pending"});
     }
   },
   actions: {
