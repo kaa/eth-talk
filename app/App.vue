@@ -19,36 +19,35 @@
     <div class="container">
       <div :class="['alert', watch.status=='pending' ? 'alert-info' : 'alert-success']" v-for="watch in watches">{{watch.message}}</div>
       <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}</div>
+      <Postbox />
       <div class="panel panel-default" v-for="post in posts">
         <div class="panel-heading">{{post.author}} {{post.timestamp}}</div>
         <div class="panel-body">
           {{post.message}}
         </div>
       </div>
-      <div class="form-group">
-        <textarea class="form-control" v-model="message"></textarea>
-      </div>
-      <div class="form-group">
-        <button class="btn btn-primary" :disabled="!message" @click.prevent="post(message)">Post it!</button>
-      </div>
     </div>
   </div>
 </template>
 <script>
-import { mapState, mapGetters, mapActions, createNamespacedHelpers } from 'vuex'
+import { mapState, mapGetters, mapActions, createNamespacedHelpers } from 'vuex';
+import Postbox from './components/Postbox.vue';
 
 export default {
+  components: {
+    Postbox
+  },
   data() {
     return {
       message: ""
     }
   },
   computed: {
-    ...mapState(["account","errors"]),
+    ...mapState(["account","errors","watches"]),
     ...mapState("posts", ["posts"])
   },
   methods: {
-    ...mapActions("posts", ["refresh", "post"])
+    ...mapActions("posts", ["refresh"])
   },
   mounted() {
     this.refresh();
