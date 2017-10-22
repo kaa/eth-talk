@@ -13,6 +13,14 @@ contract Talk {
     owner = msg.sender;
   }
 
+  function countPosts() constant returns (uint) {
+    return posts.length;
+  }
+
+  function getPost(uint index) constant returns (address, string) {
+    return (posts[index].author, posts[index].message);
+  }
+
   function post(string message) returns (uint) {
     uint latestPostId = posts.push(Post({
       author: msg.sender,

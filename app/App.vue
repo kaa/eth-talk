@@ -16,17 +16,23 @@
         </p>
       </div>
     </nav>
-  <div class="container">
+    <div class="container">
       <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
-    <div class="form-group">
-      <textarea class="form-control" v-model="message"></textarea>
+      <div class="panel panel-default" v-for="post in posts">
+        <div class="panel-heading">{{post.author}}</div>
+        <div class="panel-body">
+          {{post.message}}
+        </div>
+      </div>
+      <div class="form-group">
+        <textarea class="form-control" v-model="message"></textarea>
+      </div>
+      <div class="form-group">
+        <button class="btn btn-primary" :disabled="!message" @click.prevent="postMessage">Post it!</button>
+      </div>
     </div>
-    <div class="form-group">
-      <button class="btn btn-primary" :disabled="!message" @click.prevent="postMessage">Post it!</button>
-    </div>
-  </div>
   </div>
 </template>
 <script>
@@ -46,7 +52,19 @@ export default {
     },
     errors() {
       return this.$store.state.errors;
+    },
+    posts() {
+      return this.$store.state.posts;
     }
+  },
+  methods: {
+    async postMessage() {
+      if(!this.message || !this.message.length) return;
+      this.$store.dispatch("postMessage", this.message);
+    }
+  },
+  mounted() {
+    this.$store.dispatch("refreshPosts");
   }
 }
 </script>
