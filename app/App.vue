@@ -1,12 +1,32 @@
 <template>
+  <div class="app">
+    <nav class="navbar navbar-default">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">
+            eth-talk
+          </a>
+        </div>
+        <p class="navbar-text navbar-right">
+          <template v-if="account">
+            Signed in {{account.address}} 
+            <template v-if="account.balance">{{account.balance}} ETH</template>
+          </template>
+          <template v-else>Not signed in</template>
+        </p>
+      </div>
+    </nav>
   <div class="container">
-    <div v-if="error" style="color: red">{{error}}</div>
+      <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
     <div class="form-group">
       <textarea class="form-control" v-model="message"></textarea>
     </div>
     <div class="form-group">
       <button class="btn btn-primary" :disabled="!message" @click.prevent="postMessage">Post it!</button>
     </div>
+  </div>
   </div>
 </template>
 <script>
@@ -17,36 +37,19 @@ import { contracts } from './contracts';
 export default {
   data() {
     return {
-      error: null,
-      accountBalance: null,
       message: ""
     }
   },
-  methods: {
-    getDefaultAccount() {
-      return new Promise((res,rej) => 
-        web3.eth.getAccounts(async (err,accounts) => err ? rej(err) : res(accounts[0]))
-      );
+  computed: {
+    account() {
+      return this.$store.state.account;
     },
-    async postMessage() {
-      this.message = "";
-      var hash = sha("sha256").update(this.message).digest("hex");
-      var account = await this.getDefaultAccount();
-      contracts.talk
-        .then(talk => talk.post(hash, { from: account }))
-        .then(tx => console.log(tx))
-        .catch(err => this.error = err)
+    errors() {
+      return this.$store.state.errors;
     }
-  },
-  async mounted() {
-    let account = await this.getDefaultAccount();
-    let balance = await new Promise((res,rej) => 
-      web3.eth.getBalance(account,(err,balance) => err ? rej(err) : res(web3.fromWei(balance)))
-    );
-    this.accountBalance = parseFloat(balance);
   }
 }
 </script>
 <style>
-  @import "../node_modules/bootstrap/dist/css/bootstrap.css"
+  @import "../node_modules/bootstrap/dist/css/bootstrap.css";
 </style>
