@@ -12,7 +12,8 @@
 <script>
 import sha from 'sha.js';
 import { default as Web3} from 'web3';
-import { Talk } from './contracts';
+import { contracts } from './contracts';
+
 export default {
   data() {
     return {
@@ -31,7 +32,7 @@ export default {
       this.message = "";
       var hash = sha("sha256").update(this.message).digest("hex");
       var account = await this.getDefaultAccount();
-      Talk.deployed()
+      contracts.talk
         .then(talk => talk.post(hash, { from: account }))
         .then(tx => console.log(tx))
         .catch(err => this.error = err)
