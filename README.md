@@ -3,16 +3,13 @@ Example webpack project with Truffle. Includes contracts, migrations, tests, use
 
 ## Usage
 
-To initialize a project with this example, run `truffle init webpack` inside an empty directory.
+Run `testrpc` for the 1st time or run `testrpc --acount="<account private key>, 100000000000000000000"` to use specific account with 100 ethers in balance.
 
 ## Building and the frontend
 
 1. First run `truffle compile`, then run `truffle migrate` to deploy the contracts onto your network of choice (default "development").
-1. Then run `npm run dev` to build the app and serve it on http://localhost:8080
-
-## Possible upgrades
-
-* Use the webpack hotloader to sense when contracts or javascript have been recompiled and rebuild the application. Contributions welcome!
+2. To deploy on local, use `npm run compile`
+3. Then run `npm run dev` to build the app and serve it on http://localhost:8080
 
 ## Common Errors
 
