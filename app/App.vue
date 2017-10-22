@@ -15,6 +15,8 @@
 import sha from 'sha.js';
 import { default as Web3 } from 'web3';
 import { Talk } from './contracts';
+import utilities from './utilities';
+
 export default {
   data() {
     return {
@@ -47,13 +49,22 @@ export default {
         })
       })
     },
+    getTransactionsByAccount(acc) {
+      return new Promise((res, rej) => {
+        return utilities.getTransactionsByAccount(acc, async (err, transactions) => {
+          console.log('tx list: ', transactions)
+          return err ? rej(err) : res (transactions)
+        })
+      })
+    },
     async postMessage() {
       console.log("Posting message "+this.message);
       //var hash = sha("sha256").update(this.message).digest("hex");
       var account = await this.getDefaultAccount();
       Talk.deployed()
         .then(talk => { console.log("Deployed"); return talk.post(this.message, { from: account }) })
-        .then(tx => {          
+        .then(tx => {  
+          console.log('receipt: ', tx)        
           return this.getTransactionById(tx.tx)
         })
         .then(txData => {
@@ -62,6 +73,9 @@ export default {
         })
         .then(async () => {
           this.txCount = await this.getTransactionCount(this.account)
+        })
+        .then(() => {
+          this.getTransactionsByAccount(this.account)
         })
         .catch(err => {this.error = err; console.log('err: ', err)})
     }
