@@ -36,9 +36,7 @@
   </div>
 </template>
 <script>
-import sha from 'sha.js';
-import { default as Web3} from 'web3';
-import { contracts } from './contracts';
+import { mapState, mapGetters, mapActions, createNamespacedHelpers } from 'vuex'
 
 export default {
   data() {
@@ -47,24 +45,14 @@ export default {
     }
   },
   computed: {
-    account() {
-      return this.$store.state.account;
-    },
-    errors() {
-      return this.$store.state.errors;
-    },
-    posts() {
-      return this.$store.state.posts;
-    }
+    ...mapState(["account","errors"]),
+    ...mapState("posts", ["posts"])
   },
   methods: {
-    async postMessage() {
-      if(!this.message || !this.message.length) return;
-      this.$store.dispatch("postMessage", this.message);
-    }
+    ...mapActions("posts", ["refresh"])
   },
   mounted() {
-    this.$store.dispatch("refreshPosts");
+    this.refresh();
   }
 }
 </script>
