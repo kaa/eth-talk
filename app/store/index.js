@@ -16,6 +16,9 @@ export default new Vuex.Store({
     },
     balance(state, balance) {
       state.account = { address: this.state.account.address, balance };
+    },
+    addError(state, message) {
+      state.errors.push(message);
     }
   },
   actions: {
