@@ -21,7 +21,7 @@
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
       </div>
       <div class="panel panel-default" v-for="post in posts">
-        <div class="panel-heading">{{post.author}}</div>
+        <div class="panel-heading">{{post.author}} {{post.timestamp}}</div>
         <div class="panel-body">
           {{post.message}}
         </div>
@@ -30,7 +30,7 @@
         <textarea class="form-control" v-model="message"></textarea>
       </div>
       <div class="form-group">
-        <button class="btn btn-primary" :disabled="!message" @click.prevent="postMessage">Post it!</button>
+        <button class="btn btn-primary" :disabled="!message" @click.prevent="post(message)">Post it!</button>
       </div>
     </div>
   </div>
@@ -49,7 +49,7 @@ export default {
     ...mapState("posts", ["posts"])
   },
   methods: {
-    ...mapActions("posts", ["refresh"])
+    ...mapActions("posts", ["refresh", "post"])
   },
   mounted() {
     this.refresh();

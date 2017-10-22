@@ -26,11 +26,15 @@ export default {
         Array(state.totalCount).fill()
           .map((_,i) => contracts.talk.getPost(i))
       );
-      commit('posts', posts.map(t => ({ author: t[0], message: t[1] })));
+      commit('posts', posts.map(t => ({ 
+        author: t[0], 
+        timestamp: new Date(t[1].toNumber()*1000), 
+        message: t[2] 
+      })));
     },
     async post({state, rootState, commit, dispatch}, message) {
       if(!message || !message.length) return;
-      if(!rootState.account.address) return;
+      if(!rootState.account) return;
       await contracts.talk.post(message, { from: rootState.account.address });
       dispatch("refresh");
     }
