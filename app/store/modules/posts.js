@@ -39,8 +39,7 @@ export default {
     async post({state, rootState, commit, dispatch}, message) {
       if(!message || !message.length) return;
       if(!rootState.account) return dispatch("addError", "Must be logged in to post", {root: true });
-      var receipt = await contracts.talk.post(message, { from: rootState.account.address })
-        .on("confirmation", (nr,rec) => console.log("received confirmation", nr, "for tx", rec));
+      var receipt = await contracts.talk.post(message, { from: rootState.account.address });
       commit("addTxWatch", { tx: receipt.tx, message: "Pending post" }, { root: true });
     }
   }
