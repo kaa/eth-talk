@@ -11,7 +11,7 @@ window.addEventListener("load", async () => {
   }
 
   window.web3 = new Web3(web3.currentProvider);
-  watchAccount();
+  store.dispatch("watchCurrentAccount");
   watchPendingTransactions();
 
   await initializeContracts(web3.currentProvider);
@@ -35,20 +35,4 @@ async function watchPendingTransactions() {
     }));
   await Promise.all(watchPromises);
   setTimeout(watchPendingTransactions, 1000);
-}
-
-function watchAccount() {
-  var account;
-  (function poll() {
-    web3.eth.getAccounts((err,acc) => {
-      setTimeout(poll, 500);
-      if(acc[0] == account) return;
-      account = acc[0];
-      if(!account) {
-        return store.commit("account", null);
-      }
-      store.commit("account", { address: account });
-      store.dispatch("refreshBalance");
-    });
-  })();
 }
