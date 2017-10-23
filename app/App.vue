@@ -17,7 +17,7 @@
       </div>
     </nav>
     <div class="container">
-      <div :class="['alert', watch.status=='pending' ? 'alert-info' : 'alert-success']" v-for="watch in watches">{{watch.message}}</div>
+      <div :class="['alert', watch.status=='pending' ? 'alert-info' : 'alert-success']" v-for="watch in txWatches">{{watch.message}}</div>
       <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}</div>
       <Postbox />
       <Postlist />
@@ -40,7 +40,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["account","errors","watches"])
+    ...mapState(["account","errors","txWatches"])
   }
 }
 </script>

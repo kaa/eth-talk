@@ -23,7 +23,7 @@ window.addEventListener("load", async () => {
 });
 
 async function watchPendingTransactions() {
-  var watchPromises = store.state.watches
+  var watchPromises = store.state.txWatches
     .filter(t => t.status === "pending")
     .map(async t => new Promise((res,rej) => {
       web3.eth.getTransactionReceipt(t.tx, (err,receipt) => {

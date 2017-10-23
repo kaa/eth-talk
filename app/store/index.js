@@ -9,7 +9,7 @@ export default new Vuex.Store({
   state: {
     account: null,
     errors: [],
-    watches: []
+    txWatches: []
   },
   mutations: {
     account(state, account) {
@@ -22,7 +22,7 @@ export default new Vuex.Store({
       state.errors.push(message);
     },
     addTxWatch(state, {tx, message}) {
-      state.watches.push({tx, message, status: "pending"});
+      state.txWatches.push({tx, message, status: "pending"});
     }
   },
   actions: {
