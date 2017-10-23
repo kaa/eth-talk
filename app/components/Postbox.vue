@@ -1,20 +1,23 @@
 <template> 
-  <form>
+  <form class="well" v-if="account">
     <div class="form-group">
+      <label>Post new message</label>
       <textarea class="form-control" :disabled="pending" v-model="message"></textarea>
     </div>
-    <div class="form-group">
-      <button class="btn btn-primary" :disabled="!message || pending" @click.prevent="post(message)">Post it!</button>
-    </div>
+    <button class="btn btn-primary" :disabled="!message || pending" @click.prevent="post(message)">Post it!</button>
   </form>
 </template>
 <script>
+import { mapState } from 'vuex'
 export default {
   data() {
     return {
       pending: false,
       message: ""
     }
+  },
+  computed: {
+    ...mapState(["account"])
   },
   methods: {
     async post() {
