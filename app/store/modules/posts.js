@@ -1,4 +1,7 @@
 import { contracts } from '../../contracts.js'
+import { range } from '../../util.js'
+
+const PAGE_SIZE = 10;
 
 export default {
   namespaced: true,
@@ -8,7 +11,8 @@ export default {
     totalCount: null
   },
   getters: {
-    posts: state => state.posts
+    posts: state => state.posts,
+    pages: state => state.totalCount/PAGE_SIZE
   },
   mutations: {
     posts(state, posts) {
@@ -20,12 +24,12 @@ export default {
   },
   actions: {
     async refresh({state, commit, dispatch}) {
-      var count = await contracts.talk.countPosts();
-      commit('totalCount', count.toNumber());
-
+      var count = (await contracts.talk.countPosts()).toNumber();
+      commit('totalCount', count);
+      var start = state.totalCount - state.offset - 1;
+      var end = start - Math.min(PAGE_SIZE, state.totalCount);
       var posts = await Promise.all(
-        Array(state.totalCount).fill()
-          .map((_,i) => contracts.talk.getPost(i))
+        range(start, end).map(contracts.talk.getPost)
       );
       commit('posts', posts.map(t => ({ 
         author: t[0], 

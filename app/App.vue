@@ -20,22 +20,19 @@
       <div :class="['alert', watch.status=='pending' ? 'alert-info' : 'alert-success']" v-for="watch in watches">{{watch.message}}</div>
       <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}</div>
       <Postbox />
-      <div class="panel panel-default" v-for="post in posts">
-        <div class="panel-heading">{{post.author}} {{post.timestamp}}</div>
-        <div class="panel-body">
-          {{post.message}}
-        </div>
-      </div>
+      <Postlist />
     </div>
   </div>
 </template>
 <script>
 import { mapState, mapGetters, mapActions, createNamespacedHelpers } from 'vuex';
 import Postbox from './components/Postbox.vue';
+import Postlist from './components/Postlist.vue';
 
 export default {
   components: {
-    Postbox
+    Postbox,
+    Postlist
   },
   data() {
     return {
@@ -43,14 +40,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["account","errors","watches"]),
-    ...mapState("posts", ["posts"])
-  },
-  methods: {
-    ...mapActions("posts", ["refresh"])
-  },
-  mounted() {
-    this.refresh();
+    ...mapState(["account","errors","watches"])
   }
 }
 </script>
