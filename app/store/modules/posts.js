@@ -1,46 +1,46 @@
 import { contracts } from '../../contracts.js'
 import { range } from '../../util.js'
 
-const PAGE_SIZE = 10;
-
 export default {
   namespaced: true,
   state: {
     posts: [],
-    offset: 0,
+    pageSize: 10,
+    currentPage: 1,
     totalCount: null
   },
   getters: {
-    posts: state => state.posts,
-    pages: state => state.totalCount/PAGE_SIZE
+    pages: state => state.totalCount / state.pageSize
   },
   mutations: {
-    posts(state, posts) {
+    posts(state, { posts, page, totalCount }) {
       state.posts = posts;
-    },
-    totalCount(state, value) {
-      state.totalCount = value;
+      state.totalCount = totalCount;
+      state.currentPage = page;
     }
   },
   actions: {
-    async refresh({state, commit, dispatch}) {
-      var count = (await contracts.talk.countPosts()).toNumber();
-      commit('totalCount', count);
-      var start = state.totalCount - state.offset - 1;
-      var end = start - Math.min(PAGE_SIZE, state.totalCount);
-      var posts = await Promise.all(
+    async showPage({state, commit, dispatch}, page = 1) {
+      var totalCount = (await contracts.talk.countPosts()).toNumber();
+      var offset = (page-1)*state.pageSize;
+      var start = totalCount - offset - 1;
+      var end = Math.max(0, start - state.pageSize);
+      var rawPosts = await Promise.all(
         range(start, end).map(contracts.talk.getPost)
       );
-      commit('posts', posts.map(t => ({ 
+      var posts = rawPosts.map(t => ({ 
         author: t[0], 
         timestamp: new Date(t[1].toNumber()*1000), 
         message: t[2] 
-      })));
+      }));
+      commit('posts', { posts, page, totalCount });
     },
+
     async post({state, rootState, commit, dispatch}, message) {
       if(!message || !message.length) return;
       if(!rootState.account) return dispatch("addError", "Must be logged in to post", {root: true });
-      var receipt = await contracts.talk.post(message, { from: rootState.account.address });
+      var receipt = await contracts.talk.post(message, { from: rootState.account.address })
+        .on("confirmation", (nr,rec) => console.log("received confirmation", nr, "for tx", rec));
       commit("addTxWatch", { tx: receipt.tx, message: "Pending post" }, { root: true });
     }
   }
