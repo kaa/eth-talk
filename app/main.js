@@ -44,6 +44,9 @@ function watchAccount() {
       setTimeout(poll, 500);
       if(acc[0] == account) return;
       account = acc[0];
+      if(!account) {
+        return store.commit("account", null);
+      }
       store.commit("account", { address: account });
       store.dispatch("refreshBalance");
     });
