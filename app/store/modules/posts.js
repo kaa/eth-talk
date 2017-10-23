@@ -22,6 +22,7 @@ export default {
   actions: {
     async showPage({state, commit, dispatch}, page = 1) {
       var totalCount = (await contracts.talk.countPosts()).toNumber();
+      if(totalCount==0) return;
       var offset = (page-1)*state.pageSize;
       var start = totalCount - offset - 1;
       var end = Math.max(0, start - state.pageSize);
