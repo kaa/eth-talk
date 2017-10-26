@@ -19,3 +19,10 @@ export function range(start, stop, step) {
 
   return range;
 }
+
+function promisify(fn) {
+  var args = Array.from(arguments).slice(1);
+  return new Promise((res,rej) => {
+    fn.apply(this, args.concat([(err,result) => err ? rej(err) : res(result)]));
+  });
+}
