@@ -1,6 +1,8 @@
 pragma solidity ^0.4.2;
 
 contract Talk {
+  event Posted (uint index);
+
   struct Post {
     address author;
     uint timestamp;
@@ -20,7 +22,7 @@ contract Talk {
 
   function getPost(uint index) constant returns (address, uint, string) {
     require(index < posts.length);
-    Post post = posts[index];
+    Post memory post = posts[index];
     return (post.author, post.timestamp, post.message);
   }
 
@@ -30,6 +32,7 @@ contract Talk {
       timestamp: now,
       message: message
     }));
+    Posted(latestPostId);
     return latestPostId;
   }
 }
