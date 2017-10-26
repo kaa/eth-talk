@@ -19,19 +19,16 @@
     <div class="container">
       <div :class="['alert', watch.status=='pending' ? 'alert-info' : 'alert-success']" v-for="watch in txWatches">{{watch.message}}</div>
       <div class="alert alert-danger alert-dismissable" v-for="err in errors">{{err}}</div>
-      <Postbox />
       <Postlist />
     </div>
   </div>
 </template>
 <script>
-import { mapState, mapGetters, mapActions, createNamespacedHelpers } from 'vuex';
-import Postbox from './components/Postbox.vue';
+import { mapState } from 'vuex';
 import Postlist from './components/Postlist.vue';
 
 export default {
   components: {
-    Postbox,
     Postlist
   },
   data() {
