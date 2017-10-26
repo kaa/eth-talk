@@ -20,8 +20,8 @@ export default new Vuex.Store({
     addError(state, message) {
       state.errors.push(message);
     },
-    addTxWatch(state, {tx, message}) {
-      state.txWatches.push({tx, message, status: "pending"});
+    addTxWatch(state, {tx, message, callback}) {
+      state.txWatches.push({tx, message, callback, status: "pending"});
     }
   },
   actions: {
@@ -45,6 +45,25 @@ export default new Vuex.Store({
           commit("account", { address: account });
           dispatch("refreshBalance");
         });
+      })();
+    },
+    async watchPendingTransactions({state}) {
+      (async function poll() {
+        var watchPromises = state.txWatches
+          .filter(t => t.status === "pending")
+          .map(async t => new Promise((res,rej) => {
+            web3.eth.getTransactionReceipt(t.tx, (err,receipt) => {
+              if(err) return rej(err);
+              if(!receipt) return res();
+              var ix = state.txWatches.indexOf(t);
+              state.txWatches.splice(ix,1);
+              t.status = "completed";
+              t.callback && t.callback();
+              res();
+            });
+          }));
+        await Promise.all(watchPromises);
+        setTimeout(poll, 1000);
       })();
     }
   }
