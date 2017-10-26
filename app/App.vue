@@ -31,11 +31,6 @@ export default {
   components: {
     Postlist
   },
-  data() {
-    return {
-      message: ""
-    }
-  },
   computed: {
     ...mapState(["account","errors","txWatches"])
   }

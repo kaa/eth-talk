@@ -1,4 +1,4 @@
-import { default as Web3} from 'web3';
+import { default as Web3 } from 'web3';
 import Vue from 'vue';
 import App from './App.vue';
 import { initializeContracts } from './contracts';
