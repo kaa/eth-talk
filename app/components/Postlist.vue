@@ -10,13 +10,13 @@
     <Pagination :pageSize="pageSize" :totalCount="totalCount" :currentPage="currentPage" v-on:change="showPage"/>
     <div v-if="pending || posts" class="panel panel-default">
       <template v-for="post in pending">
-      <div class="panel-heading">{{post.author}} {{post.timestamp}}</div>
+        <div class="panel-heading"><Nametag title="true" :address="post.author"/> <span class="pull-right">Pending...</span></div>
       <div class="panel-body">
         {{post.message}}
       </div>
       </template>
       <template v-for="post in posts">
-        <div class="panel-heading small">{{post.author}} {{post.timestamp}}</div>
+        <div class="panel-heading small"><Nametag title="true" :address="post.author"/> <span class="pull-right"><Timestamp :value="post.timestamp"/></span></div>
         <div class="panel-body">
           {{post.message}}
     </div>
@@ -29,11 +29,15 @@
 import { contracts } from '../contracts.js';
 import { range } from '../util.js';
 import Pagination from './Pagination.vue';
-import { mapState } from 'vuex'
+import Timestamp from './Timestamp.vue';
+import Nametag from './Nametag.vue';
+import { mapState } from 'vuex';
 
 export default {
   components: {
-    Pagination
+    Pagination,
+    Timestamp,
+    Nametag
   },
   data() {
     return {

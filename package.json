@@ -33,6 +33,8 @@
     "json-loader": "^0.5.7",
     "style-loader": "^0.13.2",
     "truffle-contract": "^1.1.11",
+    "identicon.js": "^2.3.1",
+    "human-date": "^1.4.0",
     "web3": "^1.0.0-beta.24",
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.9.2",
