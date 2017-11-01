@@ -1,11 +1,14 @@
 <template>
   <div>
-    <form class="well" v-if="account">
-      <div class="form-group">
-        <label>Post new message</label>
-        <textarea class="form-control" :disabled="pending" v-model="message"></textarea>
+    <form :class="editing||message ? 'well editing' : ''" v-if="account">
+      <div class="form-group clearfix">
+        <textarea class="message-box form-control" @blur="editing=false" @focus="editing=true" v-model="message" placeholder="Enter a message..."></textarea>
       </div>
-      <button class="btn btn-primary" :disabled="!message || pending" @click.prevent="post(message)">Post it!</button>
+      <template v-if="editing||message">
+        <p class="pull-right help-block">Some markdown is welcome here</p>
+        <button class="btn btn-primary" :disabled="!message" @click.prevent="post(message)">Submit post</button>
+        <a class="btn btn-link" href="#" @click.prevent="evt => { message=null; evt.target.blur() }">Cancel</a>
+      </template>
     </form>
     <Pagination :pageSize="pageSize" :totalCount="totalCount" :currentPage="currentPage" v-on:change="showPage"/>
     <div v-if="pending || posts" class="panel panel-default">
@@ -41,6 +44,7 @@ export default {
   },
   data() {
     return {
+      editing: false,
       pending: [],
       message: "",
       posts: [],
@@ -126,3 +130,29 @@ function transactionPromise(tx) {
 }
 
 </script>
+<style>
+  .help-block:last-child, .form-group:last-child {
+    margin-bottom: 0;
+  }
+</style>
+<style scoped>
+  .message-box {
+    height: 2.5em;
+    resize: none;
+  }
+  .editing .message-box {
+    height: 12em;
+  }
+  .editing .message-box::-webkit-input-placeholder { /* WebKit browsers */
+      color: transparent;
+  }
+  .editing .message-box:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+      color: transparent;
+  }
+  .editing .message-box::-moz-placeholder { /* Mozilla Firefox 19+ */
+      color: transparent;
+  }
+  .editing .message-box:-ms-input-placeholder { /* Internet Explorer 10+ */
+      color: transparent;
+  }
+</style>
