@@ -3,7 +3,7 @@
     <form :class="editing||message ? 'well editing' : ''" v-if="account">
       <div class="form-group clearfix">
         <textarea class="message-box form-control" @blur="editing=false" @focus="editing=true" v-model="message" placeholder="Enter a message..."></textarea>
-      </div>
+      </div> 
       <template v-if="editing||message">
         <p class="pull-right help-block">Some markdown is welcome here</p>
         <button class="btn btn-primary" :disabled="!message" @click.prevent="post(message)">Submit post</button>
@@ -14,17 +14,17 @@
     <div v-if="pending || posts" class="panel panel-default">
       <template v-for="post in pending">
         <div class="panel-heading"><Nametag title="true" :address="post.author"/> <span class="pull-right">Pending...</span></div>
-      <div class="panel-body">
-        {{post.message}}
-      </div>
+        <div class="panel-body">
+          {{post.message}}
+        </div>
       </template>
       <template v-for="post in posts">
         <div class="panel-heading small"><Nametag title="true" :address="post.author"/> <span class="pull-right"><Timestamp :value="post.timestamp"/></span></div>
         <div class="panel-body">
           {{post.message}}
-    </div>
+        </div>
       </template>
-  </div>
+    </div>
     <Pagination :pageSize="pageSize" :totalCount="totalCount" :currentPage="currentPage" v-on:change="showPage"/>
   </div>
 </template>
@@ -50,11 +50,11 @@ export default {
       posts: [],
       pageSize: 10,
       currentPage: 1,
-      totalCount: 0
+      totalCount: 0,
+      eventListener: null
     }
   },
   computed: {
-    pages: state => state.totalCount / state.pageSize,
     ...mapState(["account"])
   },
   methods: {
@@ -94,39 +94,41 @@ export default {
         .send({from: account.address })
         .on("transactionHash", _ => {
           this.pending.push(post);
-        this.message = "";
+          this.message = "";
         })
         .on("receipt", async rcpt => {
-          await delay(3000); // without automining in testrpc there is a delay
+          console.log("that was receipt", rcpt);
+          await delay(3000);
           await this.showPage();
           let ix = this.pending.indexOf(post);
           this.pending.splice(ix,1);
         })
         .on("error", err => {
           this.$store.dispatch("addError", "Unable to post "+err.toString());
-      });
+        });
     }
   },
-  mounted() {
+  filters: {
+    toPrettyDate(value) {
+      return humandate.relativeTime(value);
+    }
+  },
+  async mounted() {
     this.showPage(1);
+    this.eventListener = contracts.talk.events.Posted()
+      .on("data", evt => console.log(evt))
+      .on("changed", evt => console.log(evt))
+      .on("error", err => console.log(err));
+  },
+  beforeDestroy() {
+    if(!this.eventListener) return;
+    this.eventListener.removeAllListeners("data");
+    this.eventListener = null;
   }
 }
 
 function delay(time) {
   return new Promise((res,rej) => setTimeout(res,time));
-}
-function transactionPromise(tx) {
-  return new Promise((resolve, reject) => {
-    (function poll() {
-      console.log("polling ",tx);
-      web3.eth.getTransactionReceipt(tx, (err,receipt) => {
-        if(err) return reject(err);
-        console.log(receipt);
-        if(receipt) return resolve(receipt);
-        setTimeout(poll, 500);
-      });
-    })();
-  })
 }
 
 </script>
