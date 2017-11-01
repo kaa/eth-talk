@@ -27,22 +27,20 @@ export default new Vuex.Store({
   actions: {
     refreshBalance({state, commit}) {
       if(state.account==null) return;
-      web3.eth.getBalance(state.account.address,(err,balance) => {
-        if(err) return commit("addError", "Unable to get balance "+err);
-        commit("balance", parseFloat(web3.fromWei(balance)));
-      })
+      var balance = await web3.eth.getBalance(state.account.address);
+      commit("balance", parseFloat(web3.utils.fromWei(balance)));
     },
     watchCurrentAccount({state, commit, dispatch}) {
-      var account;
-      (function poll() {
-        web3.eth.getAccounts((err,acc) => {
+      var lastAccount;
+      (async function poll() {
+        var accounts = await web3.eth.getAccounts();
           setTimeout(poll, 500);
-          if(acc[0] == account) return;
-          account = acc[0];
-          if(!account) {
+        if(accounts[0] == lastAccount) return;
+        lastAccount = accounts[0];
+        if(!lastAccount) {
             return commit("account", null);
           }
-          commit("account", { address: account });
+        commit("account", { address: lastAccount });
           dispatch("refreshBalance");
         });
       })();

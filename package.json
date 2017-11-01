@@ -33,7 +33,7 @@
     "json-loader": "^0.5.7",
     "style-loader": "^0.13.2",
     "truffle-contract": "^1.1.11",
-    "web3": "^0.18.4",
+    "web3": "^1.0.0-beta.24",
     "webpack": "^2.7.0",
     "webpack-dev-server": "^2.9.2",
     "vue": "^2.5.2",

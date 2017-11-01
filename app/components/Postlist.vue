@@ -8,12 +8,21 @@
       <button class="btn btn-primary" :disabled="!message || pending" @click.prevent="post(message)">Post it!</button>
     </form>
     <Pagination :pageSize="pageSize" :totalCount="totalCount" :currentPage="currentPage" v-on:change="showPage"/>
-    <div class="panel panel-default" v-for="post in posts">
+    <div v-if="pending || posts" class="panel panel-default">
+      <template v-for="post in pending">
       <div class="panel-heading">{{post.author}} {{post.timestamp}}</div>
       <div class="panel-body">
         {{post.message}}
       </div>
+      </template>
+      <template v-for="post in posts">
+        <div class="panel-heading small">{{post.author}} {{post.timestamp}}</div>
+        <div class="panel-body">
+          {{post.message}}
     </div>
+      </template>
+  </div>
+    <Pagination :pageSize="pageSize" :totalCount="totalCount" :currentPage="currentPage" v-on:change="showPage"/>
   </div>
 </template>
 <script>
@@ -28,7 +37,7 @@ export default {
   },
   data() {
     return {
-      pending: false,
+      pending: [],
       message: "",
       posts: [],
       pageSize: 10,
@@ -45,7 +54,7 @@ export default {
       page = page || this.currentPage;
       if(page==0) return;
 
-      var totalCount = (await contracts.talk.countPosts()).toNumber();
+      var totalCount = parseInt(await contracts.talk.methods.countPosts().call());
       if(totalCount==0) {
         this.totalCount = 0;
         this.posts = [];
@@ -57,13 +66,13 @@ export default {
       var start = totalCount - offset - 1;
       var end = Math.max(0, start - this.pageSize);
       var rawPosts = await Promise.all(
-        range(start, end).map(contracts.talk.getPost)
+        range(start, end).map(ix => contracts.talk.methods.getPost(ix).call())
       );
       this.totalCount = totalCount;
       this.currentPage = page;
       this.posts = rawPosts.map(t => ({ 
         author: t[0], 
-        timestamp: new Date(t[1].toNumber()*1000), 
+        timestamp: new Date(parseInt(t[1])*1000), 
         message: t[2] 
       }));
     },
@@ -72,12 +81,21 @@ export default {
       if(!this.message || !this.message.length) return;
       var account = this.$store.state.account;
       if(!account) return this.$store.dispatch("addError", "Must be logged in to post");
-      var receipt = await contracts.talk.post(this.message, { from: account.address });
-      this.pending = true;
-      web3.eth.filter({address: contracts.talk.address}).watch((err,res) => {
-        this.showPage();
-        this.pending = false;
+      var post = { message: this.message.toString(), author: account.address, timestamp: new Date() };
+      contracts.talk.methods.post(post.message)
+        .send({from: account.address })
+        .on("transactionHash", _ => {
+          this.pending.push(post);
         this.message = "";
+        })
+        .on("receipt", async rcpt => {
+          await delay(3000); // without automining in testrpc there is a delay
+          await this.showPage();
+          let ix = this.pending.indexOf(post);
+          this.pending.splice(ix,1);
+        })
+        .on("error", err => {
+          this.$store.dispatch("addError", "Unable to post "+err.toString());
       });
     }
   },

@@ -14,8 +14,7 @@ window.addEventListener("load", async () => {
   store.dispatch("watchCurrentAccount");
   store.dispatch("watchPendingTransactions");
 
-
-  await initializeContracts(web3.currentProvider);
+  await initializeContracts(web3);
   new Vue({
     store,
     el: '#talkapp',
