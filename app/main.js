@@ -12,7 +12,7 @@ window.addEventListener("load", async () => {
 
   window.web3 = new Web3(web3.currentProvider);
   store.dispatch("watchCurrentAccount");
-  store.dispatch("watchPendingTransactions");
+  store.dispatch("initializeIPFS");
 
   await initializeContracts(web3);
   new Vue({
