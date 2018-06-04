@@ -2,15 +2,16 @@ pragma solidity ^0.4.2;
 
 contract Talk {
   event Posted (uint index);
-
+  Post[] posts;
   struct Post {
     address author;
     uint timestamp;
     string message;
   }
 
+  mapping(address => string) nicks;
+
   address public owner;
-  Post[] public posts;
 
   function Talk() {
     owner = msg.sender;
@@ -20,10 +21,18 @@ contract Talk {
     return posts.length;
   }
 
-  function getPost(uint index) constant returns (address, uint, string) {
+  function getPost(uint index) constant returns (address, string, uint, string) {
     require(index < posts.length);
     Post memory post = posts[index];
-    return (post.author, post.timestamp, post.message);
+    string memory nick = nicks[post.author];
+    return (post.author, nick, post.timestamp, post.message);
+  }
+
+  function nick(string nickName) {
+    nicks[msg.sender] = nickName;
+  }
+  function getNick() constant returns (string) {
+    return nicks[msg.sender];
   }
 
   function post(string message) returns (uint) {
